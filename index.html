@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>振分表自動生成システム 進捗報告</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700;900&family=Noto+Serif+JP:wght@400;700&display=swap');
+
+  :root {
+    --ink: #1a1a1a;
+    --paper: #faf8f4;
+    --accent: #2d5a27;
+    --accent-light: #e8f0e7;
+    --accent-mid: #4a7c42;
+    --amber: #c67c1a;
+    --amber-light: #fdf3e3;
+    --red: #c0392b;
+    --red-light: #fdecea;
+    --border: #d4cfc7;
+    --mid: #6b6560;
+    --check: #2d7d32;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Noto Sans JP', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    font-size: 14px;
+    line-height: 1.7;
+  }
+
+  /* ===== HEADER ===== */
+  .header {
+    background: var(--accent);
+    color: white;
+    padding: 40px 48px 32px;
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    right: -60px; top: -60px;
+    width: 280px; height: 280px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.06);
+  }
+  .header::after {
+    content: '';
+    position: absolute;
+    right: 60px; bottom: -80px;
+    width: 160px; height: 160px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .header-tag {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    color: rgba(255,255,255,0.9);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    padding: 3px 12px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+  }
+  .header h1 {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 26px;
+    font-weight: 700;
+    line-height: 1.4;
+    margin-bottom: 8px;
+  }
+  .header-sub {
+    font-size: 13px;
+    color: rgba(255,255,255,0.75);
+  }
+  .header-meta {
+    display: flex;
+    gap: 24px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+  }
+  .header-meta-item {
+    font-size: 12px;
+    color: rgba(255,255,255,0.8);
+  }
+  .header-meta-item strong {
+    display: block;
+    font-size: 15px;
+    color: white;
+  }
+
+  /* ===== LAYOUT ===== */
+  .container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 24px 60px;
+  }
+
+  .section {
+    margin-top: 48px;
+  }
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid var(--accent);
+  }
+  .section-num {
+    width: 32px; height: 32px;
+    background: var(--accent);
+    color: white;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 700;
+    flex-shrink: 0;
+  }
+  .section-title {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* ===== BEFORE/AFTER ===== */
+  .ba-wrap {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 0;
+    align-items: center;
+  }
+  .ba-box {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+  .ba-box.before { border-color: #bbb; }
+  .ba-box.after  { border-color: var(--accent); border-width: 2px; }
+  .ba-label {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    padding: 2px 10px;
+    border-radius: 4px;
+    margin-bottom: 12px;
+  }
+  .ba-label.before { background: #eee; color: #666; }
+  .ba-label.after  { background: var(--accent-light); color: var(--accent); }
+  .ba-box h3 { font-size: 15px; margin-bottom: 10px; }
+  .ba-arrow {
+    font-size: 32px;
+    color: var(--accent);
+    text-align: center;
+    padding: 0 16px;
+  }
+  .flow-step {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 8px 0;
+    font-size: 13px;
+  }
+  .flow-step::before {
+    content: '';
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .before .flow-step::before { background: #bbb; }
+  .after  .flow-step::before { background: var(--accent); }
+  .flow-connector {
+    font-size: 11px;
+    color: #aaa;
+    margin-left: 6px;
+  }
+  .note-box {
+    background: var(--accent-light);
+    border-left: 3px solid var(--accent);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    margin-top: 16px;
+    font-size: 13px;
+    color: var(--accent);
+  }
+
+  /* ===== TIMELINE ===== */
+  .timeline {
+    position: relative;
+    padding-left: 32px;
+  }
+  .timeline::before {
+    content: '';
+    position: absolute;
+    left: 10px; top: 8px; bottom: 8px;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent-mid), var(--amber));
+  }
+  .tl-item {
+    position: relative;
+    margin-bottom: 28px;
+  }
+  .tl-dot {
+    position: absolute;
+    left: -26px; top: 4px;
+    width: 16px; height: 16px;
+    border-radius: 50%;
+    border: 2.5px solid white;
+    box-shadow: 0 0 0 2px currentColor;
+  }
+  .tl-dot.done    { background: var(--accent);    color: var(--accent); }
+  .tl-dot.now     { background: var(--amber);     color: var(--amber); }
+  .tl-dot.future  { background: #ccc;             color: #ccc; }
+  .tl-date {
+    font-size: 11px;
+    color: var(--mid);
+    margin-bottom: 3px;
+  }
+  .tl-title {
+    font-weight: 700;
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  .tl-body {
+    font-size: 13px;
+    color: #555;
+    line-height: 1.6;
+  }
+  .tl-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    margin-left: 8px;
+    vertical-align: middle;
+  }
+  .badge-done   { background: var(--accent-light); color: var(--accent); }
+  .badge-now    { background: var(--amber-light);  color: var(--amber); }
+  .badge-future { background: #f0f0f0;             color: #888; }
+
+  /* ===== FLOW CHART ===== */
+  .flowchart {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 24px 0;
+  }
+  .fc-node {
+    flex-shrink: 0;
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 14px 18px;
+    text-align: center;
+    min-width: 120px;
+  }
+  .fc-node.highlight { border-color: var(--accent); border-width: 2px; background: var(--accent-light); }
+  .fc-node .fc-icon { font-size: 22px; margin-bottom: 6px; }
+  .fc-node .fc-label { font-size: 12px; font-weight: 700; color: var(--ink); }
+  .fc-node .fc-sub { font-size: 11px; color: var(--mid); margin-top: 2px; }
+  .fc-arrow {
+    font-size: 20px;
+    color: var(--accent);
+    padding: 0 8px;
+    flex-shrink: 0;
+  }
+  .fc-note {
+    font-size: 10px;
+    color: var(--mid);
+    text-align: center;
+    margin-top: 4px;
+  }
+  .warn-box {
+    background: #fff8e1;
+    border: 1.5px solid #f9a825;
+    border-radius: 8px;
+    padding: 10px 16px;
+    margin-top: 16px;
+    font-size: 13px;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  .warn-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+
+  .sheet-example {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-top: 16px;
+  }
+  .sheet-tab {
+    background: var(--accent);
+    color: white;
+    font-size: 12px;
+    padding: 6px 14px;
+    border-radius: 6px 6px 0 0;
+    font-weight: 500;
+  }
+  .sheet-tab.sub { background: var(--accent-mid); }
+  .sheet-tab.inactive { background: #ccc; color: #666; }
+
+  /* ===== CHECKLIST ===== */
+  .check-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .check-col-header {
+    font-weight: 700;
+    font-size: 13px;
+    padding: 10px 16px;
+    border-radius: 8px 8px 0 0;
+    margin-bottom: 0;
+  }
+  .check-col-header.done   { background: var(--accent);    color: white; }
+  .check-col-header.future { background: var(--amber);     color: white; }
+  .check-list {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    overflow: hidden;
+  }
+  .check-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0ece6;
+    font-size: 13px;
+  }
+  .check-item:last-child { border-bottom: none; }
+  .check-icon { font-size: 15px; flex-shrink: 0; margin-top: 1px; }
+
+  /* ===== TEST RESULT ===== */
+  .result-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .result-card {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    padding: 16px;
+    text-align: center;
+  }
+  .result-card.success { border-color: var(--check); }
+  .result-num {
+    font-family: 'Noto Serif JP', serif;
+    font-size: 32px;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .result-unit { font-size: 13px; color: var(--mid); }
+  .result-label { font-size: 12px; color: var(--mid); margin-top: 6px; }
+
+  .test-detail {
+    background: white;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .test-row {
+    display: grid;
+    grid-template-columns: 120px 60px 1fr;
+    gap: 0;
+    border-bottom: 1px solid #f0ece6;
+  }
+  .test-row:last-child { border-bottom: none; }
+  .test-row.header { background: var(--accent); color: white; font-weight: 700; font-size: 12px; }
+  .test-cell {
+    padding: 10px 14px;
+    font-size: 13px;
+    border-right: 1px solid #f0ece6;
+  }
+  .test-cell:last-child { border-right: none; }
+  .test-ok { color: var(--check); font-weight: 700; }
+
+  /* ===== FOOTER ===== */
+  .footer {
+    background: var(--ink);
+    color: rgba(255,255,255,0.7);
+    text-align: center;
+    padding: 24px;
+    font-size: 12px;
+    margin-top: 60px;
+  }
+  .footer strong { color: white; }
+
+  /* ===== TABLES ===== */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1.5px solid var(--border);
+  }
+  th {
+    background: var(--accent);
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 500;
+  }
+  td {
+    padding: 10px 14px;
+    border-bottom: 1px solid #f0ece6;
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #faf8f4; }
+
+  @media print {
+    body { font-size: 12px; }
+    .header { padding: 28px 36px 24px; }
+    .section { margin-top: 36px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-tag">進捗報告レポート</div>
+  <h1>振分表 自動生成システム<br>開発進捗のご報告</h1>
+  <p class="header-sub">森脇商店さま向け ／ 作成：LLC Rip.D　芳村裕太</p>
+  <div class="header-meta">
+    <div class="header-meta-item"><strong>2026年5月26日</strong>報告日</div>
+    <div class="header-meta-item"><strong>実機テスト</strong>フェーズ</div>
+    <div class="header-meta-item"><strong>6月分・12校</strong>動作確認済み</div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- ① 全体像 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">1</div>
+      <div class="section-title">全体像：Before → After</div>
+    </div>
+
+    <div class="ba-wrap">
+      <div class="ba-box before">
+        <div class="ba-label before">今まで（手作業）</div>
+        <h3>商魂入力 → 手書き振分表</h3>
+        <div class="flow-step">商魂に売上データを入力</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">振分表に手書きで転記</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">切り方・数量を記入</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">印刷・現場へ</div>
+      </div>
+
+      <div class="ba-arrow">→</div>
+
+      <div class="ba-box after">
+        <div class="ba-label after">これから（自動化）</div>
+        <h3>商魂TXT → 自動で振分表</h3>
+        <div class="flow-step">商魂でTXTを書き出す</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">Googleドライブに置く</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">ボタンを1回押す</div>
+        <div class="flow-connector">↓</div>
+        <div class="flow-step">振分表が自動生成 → 印刷</div>
+      </div>
+    </div>
+
+    <div class="note-box">
+      💡 手書きで転記していた時間と転記ミスが、ボタン1回でゼロになります。切り方などの細かい情報も、将来的にはセルに自動表示できるよう設計中です。
+    </div>
+  </div>
+
+  <!-- ② タイムライン -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">2</div>
+      <div class="section-title">これまでの経緯タイムライン</div>
+    </div>
+
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-date">2026年4月</div>
+        <div class="tl-title">基本設計・マスタ整備 <span class="tl-badge badge-done">✅ 完了</span></div>
+        <div class="tl-body">34施設・12品目のマスタデータを整備。施設コード・商品コードを全件登録。先方からいただいた商品コード一覧・施設コード一覧をもとに確定。</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-date">2026年5月上旬</div>
+        <div class="tl-title">先方ご確認事項の反映 <span class="tl-badge badge-done">✅ 完了</span></div>
+        <div class="tl-body">文字コード（UTF-8）確認、ハムのコード確定（0120・0121）、ウインナー・焼き豚・ささみミンチの列追加、寺田病院3コードの合算処理、数量kg/g自動切り替えを実装。</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-date">2026年5月中旬</div>
+        <div class="tl-title">仕組みの改善設計 <span class="tl-badge badge-done">✅ 完了</span></div>
+        <div class="tl-body">「最新1日分だけ生成」から「全日付を一括生成」に変更。処理済みファイルを移動しない設計に変更（何度でも再実行OK）。伝票Noによる重複防止も実装。</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot now"></div>
+        <div class="tl-date">2026年5月26日</div>
+        <div class="tl-title">実機テスト成功 🎉 <span class="tl-badge badge-now">← 今ここ</span></div>
+        <div class="tl-body">6月分・小学校12校のデータ（209件）を読み込み、19日分の振分表を自動生成。数量の照合も確認済み。</div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot future"></div>
+        <div class="tl-date">次のステップ</div>
+        <div class="tl-title">仕上げ・現場テスト <span class="tl-badge badge-future">これから</span></div>
+        <div class="tl-body">印刷レイアウト調整、切り方情報の自動表示、保育園・その他施設データでの確認、現場での試用。</div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ③ 運用フロー -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">3</div>
+      <div class="section-title">いま動いている仕組み（運用フロー）</div>
+    </div>
+
+    <div class="flowchart">
+      <div>
+        <div class="fc-node highlight">
+          <div class="fc-icon">🖥️</div>
+          <div class="fc-label">商魂</div>
+          <div class="fc-sub">売上データ入力済み</div>
+        </div>
+      </div>
+      <div class="fc-arrow">→</div>
+      <div>
+        <div class="fc-node">
+          <div class="fc-icon">📄</div>
+          <div class="fc-label">TXT書き出し</div>
+          <div class="fc-sub">UTF-8形式</div>
+        </div>
+        <div class="fc-note">7列または10列<br>どちらも対応✅</div>
+      </div>
+      <div class="fc-arrow">→</div>
+      <div>
+        <div class="fc-node">
+          <div class="fc-icon">📁</div>
+          <div class="fc-label">Googleドライブ</div>
+          <div class="fc-sub">moriwaki-csv-input</div>
+        </div>
+        <div class="fc-note">置くだけ・移動不要</div>
+      </div>
+      <div class="fc-arrow">→</div>
+      <div>
+        <div class="fc-node highlight">
+          <div class="fc-icon">⚙️</div>
+          <div class="fc-label">GAS自動処理</div>
+          <div class="fc-sub">ボタン1回</div>
+        </div>
+        <div class="fc-note">※GAS＝Googleの自動化ツール</div>
+      </div>
+      <div class="fc-arrow">→</div>
+      <div>
+        <div class="fc-node highlight">
+          <div class="fc-icon">📊</div>
+          <div class="fc-label">振分表</div>
+          <div class="fc-sub">自動生成完了</div>
+        </div>
+        <div class="fc-note">日付別シートで管理</div>
+      </div>
+      <div class="fc-arrow">→</div>
+      <div>
+        <div class="fc-node">
+          <div class="fc-icon">🖨️</div>
+          <div class="fc-label">印刷・確認</div>
+          <div class="fc-sub">現場で使用</div>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 20px">
+      <p style="font-size: 13px; color: var(--mid); margin-bottom: 10px">生成されるシートの例（日付＋カテゴリ名）：</p>
+      <div class="sheet-example">
+        <div class="sheet-tab">0601_小学校</div>
+        <div class="sheet-tab sub">0601_保育園</div>
+        <div class="sheet-tab sub">0601_その他施設</div>
+        <div class="sheet-tab">0602_小学校</div>
+        <div class="sheet-tab sub">0602_保育園</div>
+        <div style="color: var(--mid); font-size: 13px; padding: 6px 0">… 全日付分が自動で並びます</div>
+      </div>
+    </div>
+
+    <div class="warn-box" style="margin-top: 16px">
+      <span class="warn-icon">⚠️</span>
+      <span>シートを手動で修正した後にボタンを再実行すると、<strong>同じ日付のシートは計算値で上書きされます</strong>。手動修正後は先に印刷してから保管してください。</span>
+    </div>
+  </div>
+
+  <!-- ④ 完了 vs これから -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">4</div>
+      <div class="section-title">完了したこと ✅ と、まだこれから 🟡</div>
+    </div>
+
+    <div class="check-grid">
+      <div>
+        <div class="check-col-header done">✅ 完了したこと</div>
+        <div class="check-list">
+          <div class="check-item"><span class="check-icon">✅</span><span>34施設・全得意先コードの登録</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>13品目（牛・伊賀牛・豚・鶏・ハム・ベーコン・ウインナー・焼き豚・各ミンチ）の列設定</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>ハムコード（0120・0121の2種）確定・登録</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>数量の自動表示（1kg以上→kg、未満→g）</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>寺田病院3コード（患者・患者外・介護）を振分表1行に合算</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>薦原小学校の得意先コードを実データに合わせ0067に修正</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>7列・10列どちらのTXTにも対応</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>日付別シート生成（全日付を一括処理）</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>重複データの二重計上防止</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>エラー検知シート（未登録コードが出たら自動通知）</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span>6月分・小学校12校で実機テスト成功</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="check-col-header future">🟡 まだこれから</div>
+        <div class="check-list">
+          <div class="check-item"><span class="check-icon">🟡</span><span>16列化（豚肉・鶏肉をさらに細かく分類）— 最終ご承認待ち</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>注文ゼロの列を自動で非表示 — ルール確定済み・実装待ち</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>切り方・備考のセル内自動表示 — 商魂TXTへの備考列出力確認待ち</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>A4印刷向けレイアウト調整（文字サイズ・余白・書き込み欄）</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>最終実行日時のシート表示</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>保育園・その他施設のTXTで動作確認</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>現場での試用・フィードバック反映</span></div>
+          <div class="check-item"><span class="check-icon">🟡</span><span>クライアントアカウントへの移管・本番運用開始</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ⑤ テスト結果 -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-num">5</div>
+      <div class="section-title">今回の実機テスト結果（成功の根拠）</div>
+    </div>
+
+    <div class="result-grid">
+      <div class="result-card success">
+        <div class="result-num">12</div>
+        <div class="result-unit">校</div>
+        <div class="result-label">小学校データを投入</div>
+      </div>
+      <div class="result-card success">
+        <div class="result-num">209</div>
+        <div class="result-unit">件</div>
+        <div class="result-label">レコードを正常に読み込み</div>
+      </div>
+      <div class="result-card success">
+        <div class="result-num">19</div>
+        <div class="result-unit">日分</div>
+        <div class="result-label">の振分表を自動生成</div>
+      </div>
+    </div>
+
+    <div class="test-detail">
+      <div class="test-row header">
+        <div class="test-cell">確認項目</div>
+        <div class="test-cell">結果</div>
+        <div class="test-cell">補足</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">小学校シート</div>
+        <div class="test-cell test-ok">✅ 正常</div>
+        <div class="test-cell">赤目・桔梗・桔梗南・蔵持・薦原ほか12校の数量が正しく集計された</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">保育園シート</div>
+        <div class="test-cell test-ok">✅ 正常</div>
+        <div class="test-cell">今回TXTが小学校のみのため全0表示。これは正しい動作（データがないから空）</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">その他施設シート</div>
+        <div class="test-cell test-ok">✅ 正常</div>
+        <div class="test-cell">同上。保育園・その他施設のTXTをドライブに追加するだけで同じように出力されます</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">エラー検知</div>
+        <div class="test-cell test-ok">✅ 正常</div>
+        <div class="test-cell">未登録コードなし。「✅ 正常完了」が緑で表示された</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">数量の照合（6月1日）</div>
+        <div class="test-cell test-ok">✅ 一致</div>
+        <div class="test-cell">手動計算との照合で数値の一致を確認</div>
+      </div>
+      <div class="test-row">
+        <div class="test-cell">7列TXTの読み込み</div>
+        <div class="test-cell test-ok">✅ 正常</div>
+        <div class="test-cell">6月分は7列形式。伝票No・単価・金額がなくても問題なく動作する</div>
+      </div>
+    </div>
+
+    <div class="note-box" style="margin-top: 16px">
+      📌 保育園・その他施設の振分表を出すには、同じ moriwaki-csv-input フォルダにそれらのTXTファイルを追加して、もう一度ボタンを押すだけです。追加の設定は不要です。
+    </div>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>LLC Rip.D　芳村裕太</strong>｜ご不明な点はいつでもご連絡ください｜2026年5月26日
+</div>
+
+</body>
+</html>
