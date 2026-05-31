@@ -1,0 +1,843 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>振分表自動生成 — フィードバック対応報告</title>
+  <style>
+    :root {
+      --green-dark: #2d5016;
+      --green-mid: #4a7c2e;
+      --green-light: #e8f3e0;
+      --orange: #e07b2e;
+      --orange-light: #fff4eb;
+      --yellow-light: #fffbea;
+      --yellow-border: #f0c040;
+      --gray-100: #f7f7f5;
+      --gray-200: #e8e8e4;
+      --gray-600: #666;
+      --gray-800: #333;
+      --white: #fff;
+      --radius: 12px;
+      --shadow: 0 2px 12px rgba(45, 80, 22, 0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      color: var(--gray-800);
+      background: var(--gray-100);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .page {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--white);
+      min-height: 100vh;
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(160deg, var(--green-dark) 0%, var(--green-mid) 100%);
+      color: var(--white);
+      padding: 2.5rem 1.5rem 2rem;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.18);
+      border-radius: 20px;
+      padding: 0.25rem 0.9rem;
+      font-size: 0.8rem;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: 1.45rem;
+      font-weight: 700;
+      line-height: 1.4;
+      margin-bottom: 0.75rem;
+    }
+    .hero p {
+      font-size: 0.95rem;
+      opacity: 0.92;
+      line-height: 1.6;
+    }
+
+    /* Sections */
+    section {
+      padding: 1.75rem 1.25rem;
+      border-bottom: 1px solid var(--gray-200);
+    }
+    section:last-of-type { border-bottom: none; }
+
+    .section-label {
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      color: var(--green-mid);
+      text-transform: uppercase;
+      margin-bottom: 0.4rem;
+    }
+    h2 {
+      font-size: 1.2rem;
+      color: var(--green-dark);
+      margin-bottom: 1.1rem;
+      line-height: 1.4;
+    }
+    h3 {
+      font-size: 1rem;
+      color: var(--green-dark);
+      margin: 1.25rem 0 0.6rem;
+    }
+    p { margin-bottom: 0.75rem; }
+    p:last-child { margin-bottom: 0; }
+
+    /* Cards */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--gray-200);
+      border-radius: var(--radius);
+      padding: 1rem 1.1rem;
+      margin-bottom: 0.85rem;
+      box-shadow: var(--shadow);
+    }
+    .card:last-child { margin-bottom: 0; }
+
+    .card-done   { border-left: 4px solid var(--green-mid); }
+    .card-warn   { border-left: 4px solid var(--yellow-border); background: var(--yellow-light); }
+    .card-future { border-left: 4px solid var(--orange); background: var(--orange-light); }
+    .card-info   { border-left: 4px solid #5b9bd5; background: #eef5fc; }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.6rem;
+      margin-bottom: 0.4rem;
+    }
+    .badge {
+      flex-shrink: 0;
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.15rem 0.55rem;
+      border-radius: 6px;
+      white-space: nowrap;
+    }
+    .badge-done   { background: var(--green-light); color: var(--green-dark); }
+    .badge-warn   { background: #fff3cd; color: #856404; }
+    .badge-future { background: var(--orange-light); color: #a0520a; }
+    .badge-info   { background: #dbeafe; color: #1e40af; }
+
+    .card-title { font-weight: 700; font-size: 0.95rem; line-height: 1.4; }
+    .card-body  { font-size: 0.9rem; color: var(--gray-600); }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      margin-bottom: 1.1rem;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
+      font-size: 0.8rem;
+      color: var(--gray-600);
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* Timeline */
+    .timeline { position: relative; padding-left: 1.6rem; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0.45rem;
+      top: 0.4rem;
+      bottom: 0.4rem;
+      width: 2px;
+      background: var(--green-light);
+    }
+    .tl-item {
+      position: relative;
+      margin-bottom: 1.1rem;
+    }
+    .tl-item:last-child { margin-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -1.35rem;
+      top: 0.35rem;
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+      background: var(--green-mid);
+      border: 2px solid var(--white);
+      box-shadow: 0 0 0 2px var(--green-light);
+    }
+    .tl-dot.active { background: var(--orange); box-shadow: 0 0 0 2px var(--orange-light); }
+    .tl-date {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--green-mid);
+      margin-bottom: 0.15rem;
+    }
+    .tl-text { font-size: 0.9rem; line-height: 1.55; }
+
+    /* Flow diagram */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+    }
+    .flow-step {
+      width: 100%;
+      background: var(--green-light);
+      border: 1px solid #c5ddb8;
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+      text-align: center;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--green-dark);
+    }
+    .flow-step small {
+      display: block;
+      font-weight: 400;
+      font-size: 0.78rem;
+      color: var(--gray-600);
+      margin-top: 0.2rem;
+    }
+    .flow-arrow {
+      color: var(--green-mid);
+      font-size: 1.2rem;
+      line-height: 1;
+      padding: 0.2rem 0;
+    }
+    .flow-branch {
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.6rem;
+      margin-top: 0.5rem;
+    }
+    .flow-ok  { background: #d4edda; border-color: #a3d9a5; color: #155724; }
+    .flow-ng  { background: #fde8e8; border-color: #f5b8b8; color: #721c24; }
+
+    /* Stack bar (280g breakdown) */
+    .stack-chart { margin: 1rem 0; }
+    .stack-row {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin-bottom: 0.5rem;
+      font-size: 0.85rem;
+    }
+    .stack-label { width: 7rem; flex-shrink: 0; color: var(--gray-600); }
+    .stack-bar-wrap { flex: 1; background: var(--gray-200); border-radius: 6px; height: 28px; overflow: hidden; }
+    .stack-bar { height: 100%; border-radius: 6px; display: flex; align-items: center; padding-left: 0.5rem; font-size: 0.78rem; font-weight: 700; color: var(--white); }
+    .bar-100 { width: 36%; background: var(--green-mid); }
+    .bar-180 { width: 64%; background: var(--orange); }
+    .stack-val { width: 3rem; text-align: right; font-weight: 700; flex-shrink: 0; }
+    .stack-total {
+      display: flex;
+      justify-content: space-between;
+      border-top: 2px solid var(--green-dark);
+      padding-top: 0.5rem;
+      margin-top: 0.5rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--green-dark);
+    }
+
+    /* 7:3 layout diagram */
+    .cell-diagram {
+      border: 2px solid var(--green-dark);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin: 1rem 0;
+      max-width: 280px;
+    }
+    .cell-top {
+      background: var(--green-light);
+      padding: 1rem;
+      text-align: center;
+      font-weight: 700;
+      color: var(--green-dark);
+      font-size: 0.9rem;
+      border-bottom: 2px dashed var(--green-mid);
+      min-height: 70px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .cell-top span { font-size: 0.75rem; font-weight: 400; color: var(--gray-600); margin-top: 0.25rem; }
+    .cell-bottom {
+      background: var(--white);
+      padding: 0.75rem;
+      text-align: center;
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      min-height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .cell-ratio {
+      display: flex;
+      font-size: 0.72rem;
+      color: var(--gray-600);
+      margin-top: 0.4rem;
+      gap: 0;
+    }
+    .cell-ratio span:first-child { flex: 7; text-align: center; }
+    .cell-ratio span:last-child  { flex: 3; text-align: center; }
+
+    /* Problem chain */
+    .chain {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      margin: 1rem 0;
+    }
+    .chain-box {
+      width: 100%;
+      background: var(--orange-light);
+      border: 1px solid #f0c090;
+      border-radius: var(--radius);
+      padding: 0.75rem 1rem;
+      font-size: 0.88rem;
+      text-align: center;
+      color: #7a4010;
+    }
+    .chain-arrow { color: var(--orange); font-size: 1.1rem; padding: 0.15rem 0; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; margin: 0.75rem 0; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+    }
+    th {
+      background: var(--green-dark);
+      color: var(--white);
+      padding: 0.55rem 0.7rem;
+      text-align: left;
+      font-weight: 600;
+    }
+    td {
+      padding: 0.55rem 0.7rem;
+      border-bottom: 1px solid var(--gray-200);
+      vertical-align: top;
+    }
+    tr:last-child td { border-bottom: none; }
+    tr:nth-child(even) td { background: var(--gray-100); }
+
+    /* Benefits */
+    .benefits {
+      display: grid;
+      gap: 0.75rem;
+      margin: 1rem 0;
+    }
+    .benefit {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .benefit-icon {
+      flex-shrink: 0;
+      width: 36px;
+      height: 36px;
+      background: var(--green-light);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+    .benefit-text { font-size: 0.9rem; }
+    .benefit-text strong { display: block; color: var(--green-dark); margin-bottom: 0.1rem; }
+
+    /* Checklist */
+    .checklist-box {
+      background: var(--green-light);
+      border: 2px solid var(--green-mid);
+      border-radius: var(--radius);
+      padding: 1.25rem 1.1rem;
+    }
+    .checklist-box h3 {
+      color: var(--green-dark);
+      margin: 0 0 1rem;
+      font-size: 1.05rem;
+    }
+    .check-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      padding: 0.65rem 0;
+      border-bottom: 1px solid #c5ddb8;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+    .check-item:last-child { border-bottom: none; }
+    .check-item input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+      accent-color: var(--green-mid);
+      cursor: pointer;
+    }
+    .check-item label { cursor: pointer; flex: 1; line-height: 1.5; }
+    .check-item input:checked + label { color: var(--green-dark); }
+    .check-item input:checked + label .check-done-text { display: inline; }
+    .check-done-text { display: none; color: var(--green-mid); font-size: 0.8rem; }
+
+    /* Roadmap */
+    .roadmap { display: flex; flex-direction: column; gap: 0.6rem; }
+    .road-item {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+    }
+    .road-when {
+      flex-shrink: 0;
+      background: var(--green-dark);
+      color: var(--white);
+      font-size: 0.72rem;
+      font-weight: 700;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      white-space: nowrap;
+      margin-top: 0.1rem;
+    }
+    .road-when.soon   { background: var(--orange); }
+    .road-when.later  { background: var(--gray-600); }
+    .road-text { font-size: 0.88rem; line-height: 1.5; }
+
+    /* Two-layer diagram */
+    .two-layer {
+      display: grid;
+      gap: 0.5rem;
+      margin: 1rem 0;
+    }
+    .layer {
+      border-radius: var(--radius);
+      padding: 0.85rem 1rem;
+    }
+    .layer-calc { background: var(--green-light); border: 1px solid #c5ddb8; }
+    .layer-note { background: var(--orange-light); border: 1px solid #f0c090; }
+    .layer-tag {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.3rem;
+    }
+    .layer-calc .layer-tag { color: var(--green-dark); }
+    .layer-note .layer-tag { color: #a0520a; }
+    .layer-desc { font-size: 0.88rem; }
+
+    /* Footer */
+    footer {
+      background: var(--green-dark);
+      color: rgba(255,255,255,0.85);
+      padding: 1.75rem 1.25rem;
+      text-align: center;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+    footer strong { color: var(--white); }
+
+    /* Note box */
+    .note {
+      font-size: 0.82rem;
+      color: var(--gray-600);
+      background: var(--gray-100);
+      border-radius: 8px;
+      padding: 0.65rem 0.85rem;
+      margin-top: 0.75rem;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    section { animation: fadeIn 0.4s ease both; }
+  </style>
+</head>
+<body>
+<div class="page">
+
+  <!-- ① Hero -->
+  <header class="hero">
+    <div class="hero-badge">2026年6月1日時点</div>
+    <h1>振分表自動生成<br>試運用フィードバックへの対応報告</h1>
+    <p>いただいたご意見をもとに修正を完了しました。</p>
+  </header>
+
+  <!-- ② Timeline -->
+  <section>
+    <div class="section-label">Timeline</div>
+    <h2>これまでの流れ</h2>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">5月下旬</div>
+        <div class="tl-text">本番環境を納品・試運用開始<br><small style="color:#888">商魂TXT → ドライブ → ボタン → 印刷</small></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">試運用中</div>
+        <div class="tl-text">✅ <strong>10日分まで印刷成功</strong><br>操作の簡易性・自動計算の正確さ確認済み</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">5/29 フィードバック</div>
+        <div class="tl-text">たまご列が出ない／保育園でエラー停止、とのご連絡</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-date">5/30 開発対応</div>
+        <div class="tl-text">原因特定 → 修正 → 開発環境で再テスト → <strong>エラーなし確認</strong></div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-date">5/30〜31 夜</div>
+        <div class="tl-text">本番プログラムを更新（開発側で実施）</div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot active"></div>
+        <div class="tl-date">6/1 朝（予定）</div>
+        <div class="tl-text">現場で <strong>「🔄 振分表を更新」</strong> ボタンを1回押すだけ</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ③ Feedback table -->
+  <section>
+    <div class="section-label">Feedback</div>
+    <h2>いただいたご意見と対応結果</h2>
+
+    <div class="legend">
+      <div class="legend-item"><span class="legend-dot" style="background:#4a7c2e"></span>修正済み</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#f0c040"></span>次回以降で調整</div>
+      <div class="legend-item"><span class="legend-dot" style="background:#e07b2e"></span>ご相談のうえ設計</div>
+    </div>
+
+    <div class="card card-done">
+      <div class="card-header">
+        <span class="badge badge-done">✅ 好評</span>
+        <span class="card-title">10日分印刷成功・操作しやすい</span>
+      </div>
+      <div class="card-body">そのまま継続してご利用ください。</div>
+    </div>
+
+    <div class="card card-done">
+      <div class="card-header">
+        <span class="badge badge-done">🔴 修正済</span>
+        <span class="card-title">たまご（0182）が振分表に出ない</span>
+      </div>
+      <div class="card-body">プログラム内の除外設定を解除し、<strong>14列目「たまご」列</strong>を追加しました。</div>
+    </div>
+
+    <div class="card card-done">
+      <div class="card-header">
+        <span class="badge badge-done">🔴 修正済</span>
+        <span class="card-title">保育園TXTでエラー（商品65・71）</span>
+      </div>
+      <div class="card-body">商品マスタに登録し、コード表記のゆれ（65→0065）も自動でそろえる処理を追加しました。</div>
+    </div>
+
+    <div class="card card-warn">
+      <div class="card-header">
+        <span class="badge badge-warn">🟡 保留</span>
+        <span class="card-title">手書き行・列幅をもう少し大きく</span>
+      </div>
+      <div class="card-body">ご要望として記録。次回以降で調整します。</div>
+    </div>
+
+    <div class="card card-warn">
+      <div class="card-header">
+        <span class="badge badge-warn">🟡 保留</span>
+        <span class="card-title">印刷タイトルに「○月○日（曜日）」</span>
+      </div>
+      <div class="card-body">商魂の設定確認後に対応します。</div>
+    </div>
+
+    <div class="card card-future">
+      <div class="card-header">
+        <span class="badge badge-future">🟠 将来</span>
+        <span class="card-title">1日1シートにまとめたい（3枚→1枚）</span>
+      </div>
+      <div class="card-body">ご相談のうえ設計します（将来対応）。</div>
+    </div>
+  </section>
+
+  <!-- ④ Flow -->
+  <section>
+    <div class="section-label">How it works</div>
+    <h2>いま動く仕組み</h2>
+    <p style="font-size:0.88rem;color:#666;margin-bottom:1rem;">GAS（Googleの自動化プログラム）が、フォルダ内のTXTを読み取り振分表を作ります。</p>
+
+    <div class="flow">
+      <div class="flow-step">① 商魂からTXT出力<small>文字コード：UTF-8</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">② Googleドライブ「商魂TXTデータ」に保存<small>消さず足すだけ（OK）</small></div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">③ 振分管理表 → 💡操作案内<br>「🔄 振分表を更新」ボタン</div>
+      <div class="flow-arrow">↓</div>
+      <div class="flow-step">④ ⚠️エラー確認シートを確認</div>
+      <div class="flow-branch">
+        <div class="flow-step flow-ok">🟢 緑<br><small>日付タブ更新 → 印刷</small></div>
+        <div class="flow-step flow-ng">🔴 赤<br><small>印刷せず連絡</small></div>
+      </div>
+    </div>
+
+    <div class="card card-info" style="margin-top:1.25rem;">
+      <div class="card-header">
+        <span class="badge badge-info">⚠️ ご注意</span>
+        <span class="card-title">更新ボタンを押すと…</span>
+      </div>
+      <div class="card-body" style="margin-top:0.4rem;line-height:1.7;">
+        • フォルダ内のデータで振分表を<strong>作り直します</strong><br>
+        • <strong>手書きした下段</strong>は消えます<br>
+        • <strong>印刷設定</strong>（行高・余白など手動調整）は戻ることがあります<br>
+        <span style="font-size:0.82rem;">※ 以前お電話でご説明した内容です</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑤ Dev review -->
+  <section>
+    <div class="section-label">Review</div>
+    <h2>開発側の厳しいチェックで見つかったこと</h2>
+    <p style="font-size:0.9rem;color:#666;">「バグ（修正済み）」と「ルール・設計（これから相談）」を分けて整理しました。</p>
+
+    <h3>A. 修正済み（3件）</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>問題</th><th>原因</th><th>対応</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>たまごが出ない</td>
+            <td>プログラム内で意図的に除外</td>
+            <td>除外解除＋列追加</td>
+          </tr>
+          <tr>
+            <td>保育園エラー</td>
+            <td>商品65・71が未登録</td>
+            <td>マスタ追加</td>
+          </tr>
+          <tr>
+            <td>コード表記ゆれ</td>
+            <td>TXT「65」≠ マスタ「0065」</td>
+            <td>自動4桁化</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <h3>B. 数値の違和感（6/5・虹の丘・鶏280g）</h3>
+    <p style="font-size:0.9rem;">これは<strong>転記ミスではなく</strong>、換算ルールの問題。施設・日付の対応は正しく処理確認済み。</p>
+
+    <div class="stack-chart">
+      <div class="stack-row">
+        <span class="stack-label">0065 ささみ系</span>
+        <div class="stack-bar-wrap"><div class="stack-bar bar-100">100g</div></div>
+        <span class="stack-val">100g</span>
+      </div>
+      <div class="stack-row">
+        <span class="stack-label">0071 もも皮なし</span>
+        <div class="stack-bar-wrap"><div class="stack-bar bar-180">180g</div></div>
+        <span class="stack-val">180g</span>
+      </div>
+      <div class="stack-total">
+        <span>合計（鶏列）</span>
+        <span>280g</span>
+      </div>
+    </div>
+
+    <div class="note">
+      0071は商品名に「60g×5」とありますが、単位欄は「100g」です。この食い違いが、現場の感覚（400g等）とずれる原因になっています。
+    </div>
+
+    <h3>C. 根本課題</h3>
+    <div class="chain">
+      <div class="chain-box">商品名に「60g×5」「切り方」等が混ざる</div>
+      <div class="chain-arrow">↓</div>
+      <div class="chain-box">プログラムが商品ごとに例外ルールを増やす</div>
+      <div class="chain-arrow">↓</div>
+      <div class="chain-box">現場も「数字が合わない」と感じやすくなる</div>
+    </div>
+  </section>
+
+  <!-- ⑥ Proposal -->
+  <section>
+    <div class="section-label">Proposal</div>
+    <h2>改善提案：計算と説明を分ける</h2>
+    <p>長期的には、<strong>計算に使う欄</strong>と<strong>説明用の欄</strong>を分けることで、入力のぶれに強い運用に近づけます。</p>
+
+    <div class="two-layer">
+      <div class="layer layer-calc">
+        <div class="layer-tag">計算層（上段7）</div>
+        <div class="layer-desc">数量 × 単位（100g等）<strong>だけ</strong>で自動計算 → kg / g 表示</div>
+      </div>
+      <div class="layer layer-note">
+        <div class="layer-tag">表示層（下段3）</div>
+        <div class="layer-desc">補足・切り方・内訳 → 人が読む（<strong>計算には使わない</strong>）</div>
+      </div>
+    </div>
+
+    <div class="cell-diagram">
+      <div class="cell-top">
+        3.4kg / 60g 等
+        <span>↑ 数量×単位で自動入力</span>
+      </div>
+      <div class="cell-bottom">60g×5、切り方 等の補足</div>
+    </div>
+    <div class="cell-ratio">
+      <span>上段 70%</span>
+      <span>下段 30%</span>
+    </div>
+
+    <h3>商魂への入力ルール案</h3>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>欄</th><th>ルール</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>数量・単位</strong></td>
+            <td>計算専用。余計な説明を入れない</td>
+          </tr>
+          <tr>
+            <td><strong>商品名</strong></td>
+            <td>品目が分かる程度。切り方・内訳は書かない（理想）</td>
+          </tr>
+          <tr>
+            <td><strong>8列目・補足（新設）</strong></td>
+            <td>振分表に載せたい説明をそのまま → 下段に自動表示</td>
+          </tr>
+          <tr>
+            <td><strong>手書き</strong></td>
+            <td>下段が空のマスに追記可能（従来どおり）</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="benefits">
+      <div class="benefit">
+        <div class="benefit-icon">①</div>
+        <div class="benefit-text">
+          <strong>数字の計算がブレにくい</strong>
+          数量×単位だけで機械的に計算
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-icon">②</div>
+        <div class="benefit-text">
+          <strong>「60g×5」等の説明は下段に残る</strong>
+          現場が必要な情報を失わない
+        </div>
+      </div>
+      <div class="benefit">
+        <div class="benefit-icon">③</div>
+        <div class="benefit-text">
+          <strong>プログラムの例外ルールが減る</strong>
+          将来の変更・保守が楽になる
+        </div>
+      </div>
+    </div>
+
+    <div class="note">
+      ※ 8列目の出力は<strong>商魂側の設定確認が必要</strong>です。確認後にプログラム更新（第2段階）を行います。
+    </div>
+  </section>
+
+  <!-- ⑦ Checklist -->
+  <section>
+    <div class="section-label">Action</div>
+    <h2>明日のお願い</h2>
+    <p style="font-size:0.92rem;margin-bottom:1rem;">プログラムの更新は開発側で済んでいます。朝イチでボタンを押していただければ最新の振分表になります。</p>
+
+    <div class="checklist-box">
+      <h3>🔄 更新チェックリスト</h3>
+
+      <div class="check-item">
+        <input type="checkbox" id="c1">
+        <label for="c1">商魂TXTが「商魂TXTデータ」フォルダに入っている</label>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" id="c2">
+        <label for="c2">振分管理表を開く</label>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" id="c3">
+        <label for="c3"><strong>🔄 振分表を更新</strong> ボタンを <strong>1回</strong> 押す</label>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" id="c4">
+        <label for="c4"><strong>⚠️エラー確認</strong> が <strong>緑</strong> か確認する</label>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" id="c5">
+        <label for="c5">緑ならいつも通り印刷。赤なら印刷せずご連絡ください</label>
+      </div>
+      <div class="check-item">
+        <input type="checkbox" id="c6">
+        <label for="c6">（任意）たまご列・以前エラーだった保育園の日付を目視確認</label>
+      </div>
+    </div>
+  </section>
+
+  <!-- ⑧ Roadmap -->
+  <section>
+    <div class="section-label">Roadmap</div>
+    <h2>今後の更新候補</h2>
+    <div class="roadmap">
+      <div class="road-item">
+        <span class="road-when soon">すぐ</span>
+        <span class="road-text">本番プログラム反映 → 更新ボタン → 再印刷</span>
+      </div>
+      <div class="road-item">
+        <span class="road-when">相談後</span>
+        <span class="road-text">0071等の換算ルール確定（280g vs 400g）</span>
+      </div>
+      <div class="road-item">
+        <span class="road-when">商魂確認後</span>
+        <span class="road-text">8列目・補足の自動転記（第2段階）</span>
+      </div>
+      <div class="road-item">
+        <span class="road-when later">要望次第</span>
+        <span class="road-text">列幅・手書き行・印刷タイトル（○月○日・曜日）</span>
+      </div>
+      <div class="road-item">
+        <span class="road-when later">合意後</span>
+        <span class="road-text">1日1シート統合（3カテゴリ→1枚）</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>ご質問・ご不明点は <strong>芳村</strong> まで。</p>
+    <p style="margin-top:0.5rem;opacity:0.7;font-size:0.8rem;">LLC Rip.D 2026.6.1</p>
+  </footer>
+
+</div>
+</body>
+</html>
