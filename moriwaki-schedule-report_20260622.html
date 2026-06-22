@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>森脇商店 全体プロジェクト進行スケジュール</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --surface: #faf9f5;
+    --border: #e3e0d4;
+    --text: #2c2c2a;
+    --text-secondary: #5f5e5a;
+    --text-tertiary: #8a8775;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Noto Sans JP", sans-serif;
+    line-height: 1.75;
+    padding: 0 0 60px;
+  }
+  .container { max-width: 760px; margin: 0 auto; padding: 0 16px; }
+  header.page-head { padding: 32px 16px 20px; border-bottom: 1px solid var(--border); margin-bottom: 8px; }
+  h1 { font-size: 21px; font-weight: 600; margin: 0 0 4px; }
+  .meta { color: var(--text-secondary); font-size: 13px; }
+  nav.toc { display: flex; flex-wrap: wrap; gap: 8px; margin: 16px 0 28px; }
+  nav.toc a {
+    font-size: 12px; color: var(--text-secondary); text-decoration: none;
+    border: 1px solid var(--border); border-radius: 999px; padding: 6px 12px;
+  }
+  section { margin-bottom: 40px; }
+  h2 { font-size: 17px; font-weight: 600; margin: 0 0 14px; padding-bottom: 8px; border-bottom: 1px solid var(--border); }
+  h3 { font-size: 14px; font-weight: 600; margin: 18px 0 8px; }
+  p { margin: 0 0 10px; font-size: 14px; }
+  ul { margin: 0 0 10px; padding-left: 20px; font-size: 14px; }
+  li { margin-bottom: 6px; }
+
+  .banner {
+    background: #faece7; border: 1px solid #993c1d; border-radius: 10px;
+    padding: 14px 16px; font-size: 14px; margin-bottom: 8px; color: #712b13;
+  }
+  .banner b { color: #712b13; }
+
+  .note {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 10px;
+    padding: 12px 14px; font-size: 13px; color: var(--text-secondary); margin: 10px 0;
+  }
+  .note b { color: var(--text); }
+
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+    padding: 14px 16px; overflow-x: auto; margin-bottom: 10px;
+  }
+  svg { width: 100%; height: auto; display: block; min-width: 480px; }
+
+  .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--text-secondary); margin: 10px 2px 0; }
+  .legend-item { display: flex; align-items: center; gap: 6px; }
+  .swatch { width: 10px; height: 10px; border-radius: 2px; display: inline-block; flex-shrink: 0; }
+
+  details.proj {
+    border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden;
+  }
+  details.proj summary {
+    list-style: none; cursor: pointer; padding: 13px 16px; font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  }
+  details.proj summary::-webkit-details-marker { display: none; }
+  details.proj summary::after {
+    content: "+"; font-size: 16px; color: var(--text-tertiary); flex-shrink: 0;
+  }
+  details.proj[open] summary::after { content: "−"; }
+  details.proj .body { padding: 0 16px 16px; font-size: 13.5px; color: var(--text-secondary); }
+  details.proj .body p { margin: 0 0 8px; }
+  details.proj .body b { color: var(--text); }
+
+  .tag {
+    font-size: 11px; padding: 2px 9px; border-radius: 999px; font-weight: 500; white-space: nowrap;
+  }
+  .tag-coral { background: #faece7; color: #712b13; }
+  .tag-teal { background: #e1f5ee; color: #085041; }
+  .tag-purple { background: #eeedfe; color: #3c3489; }
+  .tag-gray { background: #f1efe8; color: #444441; }
+
+  details.phase {
+    border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden;
+  }
+  details.phase summary {
+    list-style: none; cursor: pointer; padding: 13px 16px; font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 10px;
+  }
+  details.phase summary::-webkit-details-marker { display: none; }
+  details.phase summary::after {
+    content: "+"; font-size: 16px; color: var(--text-tertiary); margin-left: auto;
+  }
+  details.phase[open] summary::after { content: "−"; }
+  details.phase .body { padding: 0 16px 16px; font-size: 13.5px; }
+
+  table.simple { width: 100%; border-collapse: collapse; font-size: 13px; min-width: 480px; }
+  table.simple th, table.simple td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  table.simple th { color: var(--text-secondary); font-weight: 500; font-size: 12px; }
+
+  .risk-card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 12px 14px; margin-bottom: 8px;
+  }
+  .risk-card .risk-title { font-size: 13.5px; font-weight: 600; margin-bottom: 4px; }
+  .risk-card p { font-size: 13px; color: var(--text-secondary); margin: 0 0 4px; }
+
+  footer { margin-top: 40px; font-size: 12px; color: var(--text-tertiary); text-align: center; padding: 0 16px; }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <div class="container" style="padding:0;">
+    <h1>森脇商店 全体プロジェクト進行スケジュール</h1>
+    <div class="meta">作成日：2026年6月23日／対象期間：〜創業100周年（2027年1月1日）</div>
+  </div>
+</header>
+
+<div class="container">
+
+  <nav class="toc">
+    <a href="#policy">全体方針</a>
+    <a href="#projects">プロジェクト一覧</a>
+    <a href="#timeline">タイムライン</a>
+    <a href="#phases">フェーズ詳細</a>
+    <a href="#risks">要確認事項</a>
+  </nav>
+
+  <section id="policy">
+    <h2>0. 全体方針</h2>
+    <div class="banner">
+      <b>①振り分け自動化の再設計</b>を、全施策の中で最優先プロジェクトとして進めます。すぐに着手できる施策（広報PR・Instagram・HPリニューアル・POSデータ分析・ダッシュボードの枠組み構築）は、①の検討と並行して先行着手し、足を止めずに前進させます。
+    </div>
+
+    <p style="margin-top:18px"><b>商魂システムとPOSレジは、卸売／小売で完全に別系統のデータ・別の管理者です。</b> プロジェクト間の関係は以下のとおりです。</p>
+
+    <div class="card">
+<svg viewBox="0 0 680 475" role="img">
+<title>森脇商店 プロジェクト依存関係マップ</title>
+<line x1="170" y1="106" x2="300" y2="180" stroke="#a39f8e" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="510" y1="106" x2="380" y2="180" stroke="#a39f8e" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="170" y1="300" x2="300" y2="236" stroke="#a39f8e" stroke-width="1" marker-end="url(#arrow)"/>
+<line x1="510" y1="300" x2="380" y2="236" stroke="#a39f8e" stroke-width="1" marker-end="url(#arrow)"/>
+<defs>
+<marker id="arrow" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+<path d="M2 1L8 5L2 9" fill="none" stroke="#a39f8e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+</marker>
+</defs>
+<g>
+<rect x="40" y="50" width="160" height="56" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="120" y="68" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#085041">①卸売データ</text>
+<text x="120" y="86" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0f6e56">振り分け自動化</text>
+</g>
+<g>
+<rect x="480" y="50" width="160" height="56" rx="8" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="560" y="68" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#085041">②小売データ</text>
+<text x="560" y="86" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0f6e56">POSデータ分析</text>
+</g>
+<g>
+<rect x="260" y="180" width="160" height="56" rx="8" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+<text x="340" y="198" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#3c3489">③ポータル</text>
+<text x="340" y="216" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#534ab7">データのハブ</text>
+</g>
+<g>
+<rect x="40" y="300" width="160" height="56" rx="8" fill="#faece7" stroke="#993c1d" stroke-width="0.5"/>
+<text x="120" y="318" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#712b13">④注文データ</text>
+<text x="120" y="336" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#993c1d">注文予約アプリ</text>
+</g>
+<g>
+<rect x="480" y="300" width="160" height="56" rx="8" fill="#faece7" stroke="#993c1d" stroke-width="0.5"/>
+<text x="560" y="318" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#712b13">⑤投稿データ</text>
+<text x="560" y="336" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#993c1d">広報PR記事</text>
+</g>
+<g>
+<rect x="120" y="385" width="440" height="40" rx="8" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="340" y="405" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#444441">⑥HP・⑦Instagramは独立して進行（③への依存なし）</text>
+</g>
+<rect x="160" y="445" width="12" height="12" rx="3" fill="#1d9e75"/>
+<text x="178" y="455" font-size="12" fill="#5f5e5a">収集系データ</text>
+<rect x="300" y="445" width="12" height="12" rx="3" fill="#d85a30"/>
+<text x="318" y="455" font-size="12" fill="#5f5e5a">出力連携</text>
+<rect x="420" y="445" width="12" height="12" rx="3" fill="#7f77dd"/>
+<text x="438" y="455" font-size="12" fill="#5f5e5a">統合ハブ</text>
+</svg>
+    </div>
+
+    <div class="note">
+      <b>重要な前提：</b> 商魂とPOSの情報は転用できません。「商品マスタ（名称・規格等）の登録ルールを統一する」余地はありますが、データそのものを共有するわけではない点に注意して設計します。
+    </div>
+    <div class="note">
+      振り分け自動化（①）の再設計は卸売側（商魂・OCR）に閉じた話として進められる一方、POSデータ分析（②）は過去24ヶ月分のCD-ROMデータを既に入手済みのため、POS業者との連携を待たずに今すぐ着手できます。業者連携の確認が必要なのは将来のライブ・継続的なデータ取得のみです。広報PR・Instagram・HPリニューアルも依存しないため並行で進めます。
+    </div>
+  </section>
+
+  <section id="projects">
+    <h2>1. プロジェクト一覧と現状ステータス</h2>
+
+    <details class="proj" open>
+      <summary>① 振り分け自動化 再設計（卸売・商魂システム側） <span class="tag tag-coral">最優先</span></summary>
+      <div class="body">
+        <p><b>現状：</b> GASでMVP完成・現場稼働済み（写真撮影→Googleドライブ→GAS定期スキャン→スプレッドシート転記のOCR試行）。精度100％未達のため「入口（紙の読み取り）は人力」と判断済み。現在は自動化の対象を「振分表自動化用フォーマットへの人力入力→商魂取り込み用CSVへの自動変換」に再設計中。</p>
+        <p><b>依存関係：</b> プロジェクト全体の要件再定義（フェーズ0）の後。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>② POSレジ24ヶ月データ分析（小売軸） <span class="tag tag-teal">即着手可</span></summary>
+      <div class="body">
+        <p><b>現状：</b> 24ヶ月分のCD-ROMデータを入手・出力済み（バーコードスキャンの売上データ、月次でCD-ROM保管されていたもの）。残タスクは統合・分析・グラフ化（商品別月次売上、前年同月比、年間推移など）。</p>
+        <p><b>依存関係：</b> POS業者との連携を待たずに着手可能（業者連携が必要なのは将来のライブ・継続連携のみ。手元の24ヶ月分は連携不要）。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>③ ダッシュボード構築（→社内ポータルへ構想拡大） <span class="tag tag-purple">ハブ</span></summary>
+      <div class="body">
+        <p><b>現状：</b> 未着手。ただし売上ページの枠組みは①②の本格データを待たずに着手可能。さらに「卸売ページ／小売ページ／統合（全社）ページ」の構成に加え、各施策のデータ置き場リンク集約・施策解説ページ・ブランドコンセプト資料庫・タスク管理・通知自動化を含む社内ポータルへとスコープが拡大。</p>
+        <p><b>依存関係：</b> 枠組み構築は即着手可。本格データ統合は①②の進捗に応じて段階的に。機能が多いためモジュール単位での段階リリースが必須。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>④ 注文予約アプリ（LINEリッチメニュー）</summary>
+      <div class="body">
+        <p><b>現状：</b> UIイメージは参考サービスをもとにすり合わせ済み。残タスク：使い方（UX）の設計・必要素材の整理・LINEリッチメニュー実装・HP/③ダッシュボードとの連携設計・DB設計・フロントエンド⇄バックエンド連携。商品ラインナップは小さく絞ってスタートする方針（まずは開発に集中）。</p>
+        <p><b>依存関係：</b> ③（データ吸い上げ先の設計）・⑥（HPとのリンク方法）と設計レベルで連携が必要。本格実装は③⑥の基本構造確定後が望ましい。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>⑤ 広報PR定期発信の仕組み化 <span class="tag tag-teal">即着手可</span></summary>
+      <div class="body">
+        <p><b>現状：</b> 配信媒体・パートナー業者は確定済み。運用は原稿＋素材を業者指定の型に合わせて渡すだけで完結。Cursorで自社ブログの生成〜投稿までの自動化実績あり、実装イメージは明確。残タスク：森脇商店らしさを表す「模範解答（Few-shot、既存記事2本）」の精度向上、③ポータルへの投稿データ自動蓄積の設計。</p>
+        <p><b>依存関係：</b> 原稿生成の自動化自体は依存なし・即着手可。③ポータルへの蓄積部分のみ③の構造確定後。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>⑥ HPリニューアル <span class="tag tag-teal">即着手可</span></summary>
+      <div class="body">
+        <p><b>現状：</b> ページ全体設計・各ページのコピーは制作済み。残タスクは「写真撮影」と「実装」。</p>
+        <p><b>依存関係：</b> 依存ほぼなし、即着手可。オンライン販売との接続のみ④（予約アプリ）の後でよい。</p>
+      </div>
+    </details>
+
+    <details class="proj">
+      <summary>⑦ Instagram週次投稿自動化／スポットクリエイティブ <span class="tag tag-teal">即着手可</span></summary>
+      <div class="body">
+        <p><b>現状：</b> 運用中（手動）。</p>
+        <p><b>依存関係：</b> 依存なし、即着手可。</p>
+      </div>
+    </details>
+
+    <div class="note">
+      POSレジ自体の商品データ登録はレジ提供業者が管理しており、森脇商店側で自由に扱えるデータではない可能性があります。ただし手元の24ヶ月分CD-ROMデータの分析には影響しません。将来、リアルタイム・継続的なデータ連携を行う場合に、業者側との連携方法（API有無／エクスポート可否／契約上の制約）の確認が必要になります。
+    </div>
+    <div class="note">
+      <b>③が事実上のハブになっています：</b> ①（卸売データ）②（小売データ）④（注文データの吸い上げ先）⑤（投稿データの蓄積先）が、いずれも③ダッシュボード／ポータルとつながっています。③の基本構造（データの持ち方・ページ構成）を早期に固めることが、他施策の手戻りを防ぐ鍵になります。
+    </div>
+  </section>
+
+  <section id="timeline">
+    <h2>2. フェーズ別進行計画</h2>
+
+    <div class="card">
+<svg viewBox="0 0 680 460" role="img">
+<title>森脇商店 進行スケジュール タイムライン</title>
+<text x="202" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">7月</text>
+<text x="267" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">8月</text>
+<text x="332" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">9月</text>
+<text x="397" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">10月</text>
+<text x="462" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">11月</text>
+<text x="527" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">12月</text>
+<text x="592" y="55" text-anchor="middle" font-size="12" fill="#5f5e5a">2027</text>
+<line x1="170" y1="68" x2="625" y2="68" stroke="#e3e0d4" stroke-width="0.5"/>
+<line x1="170" y1="80" x2="170" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="235" y1="80" x2="235" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="300" y1="80" x2="300" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="365" y1="80" x2="365" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="430" y1="80" x2="430" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="495" y1="80" x2="495" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="560" y1="80" x2="560" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+<line x1="625" y1="80" x2="625" y2="406" stroke="#e3e0d4" stroke-width="0.5" stroke-dasharray="2 3"/>
+
+<g>
+<rect x="40" y="84" width="125" height="42" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+<text x="102" y="100" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#444441">フェーズ0</text>
+<text x="102" y="116" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#5f5e5a">要件再定義</text>
+<rect x="170" y="84" width="65" height="42" rx="6" fill="#f1efe8" stroke="#5f5e5a" stroke-width="0.5"/>
+</g>
+
+<g>
+<rect x="40" y="140" width="125" height="42" rx="6" fill="#faece7" stroke="#993c1d" stroke-width="1.2"/>
+<text x="102" y="156" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#712b13">フェーズ1</text>
+<text x="102" y="172" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#993c1d">①最優先</text>
+<rect x="170" y="140" width="130" height="42" rx="6" fill="#faece7" stroke="#993c1d" stroke-width="1.2"/>
+</g>
+
+<g>
+<rect x="40" y="196" width="125" height="42" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="102" y="212" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#085041">フェーズ2</text>
+<text x="102" y="228" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0f6e56">並行タスク</text>
+<rect x="170" y="196" width="260" height="42" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+</g>
+
+<g>
+<rect x="40" y="252" width="125" height="42" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+<text x="102" y="268" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#085041">フェーズ3</text>
+<text x="102" y="284" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#0f6e56">③本格稼働</text>
+<rect x="365" y="252" width="195" height="42" rx="6" fill="#e1f5ee" stroke="#0f6e56" stroke-width="0.5"/>
+</g>
+
+<g>
+<rect x="40" y="308" width="125" height="42" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+<text x="102" y="324" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#3c3489">フェーズ4</text>
+<text x="102" y="340" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#534ab7">④予約アプリ</text>
+<rect x="430" y="308" width="195" height="42" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+</g>
+
+<g>
+<rect x="40" y="364" width="125" height="42" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+<text x="102" y="380" text-anchor="middle" dominant-baseline="central" font-size="14" font-weight="500" fill="#3c3489">フェーズ5</text>
+<text x="102" y="396" text-anchor="middle" dominant-baseline="central" font-size="12" fill="#534ab7">100周年</text>
+<rect x="560" y="364" width="65" height="42" rx="6" fill="#eeedfe" stroke="#534ab7" stroke-width="0.5"/>
+</g>
+
+<rect x="40" y="424" width="12" height="12" rx="3" fill="#888780"/>
+<text x="58" y="434" font-size="12" fill="#5f5e5a">準備</text>
+<rect x="160" y="424" width="12" height="12" rx="3" fill="#d85a30"/>
+<text x="178" y="434" font-size="12" fill="#5f5e5a">最優先</text>
+<rect x="300" y="424" width="12" height="12" rx="3" fill="#1d9e75"/>
+<text x="318" y="434" font-size="12" fill="#5f5e5a">データ基盤構築</text>
+<rect x="500" y="424" width="12" height="12" rx="3" fill="#7f77dd"/>
+<text x="518" y="434" font-size="12" fill="#5f5e5a">将来展開</text>
+</svg>
+    </div>
+
+    <div class="card">
+      <table class="simple">
+        <tr><th>フェーズ</th><th>期間</th><th>内容</th></tr>
+        <tr><td>0</td><td>2026年7月</td><td>プロジェクト全体の要件再定義</td></tr>
+        <tr><td>1</td><td>2026年7月〜8月</td><td>①振り分け自動化 再設計・実装（卸売）── 最優先</td></tr>
+        <tr><td>2</td><td>2026年7月〜10月</td><td>⑤PR／⑦Instagram／⑥HP／②POS分析／③枠組み構築（フェーズ1と並行）</td></tr>
+        <tr><td>3</td><td>2026年10月〜12月</td><td>③ダッシュボード本格稼働＋モジュール拡張</td></tr>
+        <tr><td>4</td><td>2026年後半〜2027年</td><td>④注文予約アプリ（段階的）</td></tr>
+        <tr><td>5</td><td>2027年1月1日（100周年）</td><td>HP×オンライン接続／予約アプリ稼働／ブランド発信</td></tr>
+      </table>
+    </div>
+
+    <div class="note">
+      フェーズ1（①の再設計）を最優先で進めます。フェーズ2に並ぶ施策は、①の検討にすべてのリソースを割くのではなく、すぐに着手できるものから確実に前進させるための並行トラックです。優先度はフェーズ1が最も高く、フェーズ2はそれに次ぐ位置付けです。⑥HPリニューアルは設計・コピーが済んでいるため2026年内の公開を目指せます。②もデータ入手済みのため早期着手が可能です。フェーズ2では5施策が並行して動く想定のため、リソース配分に留意が必要です（4章参照）。
+    </div>
+  </section>
+
+  <section id="phases">
+    <h2>3. 各フェーズの詳細</h2>
+
+    <details class="phase" open>
+      <summary>フェーズ0｜プロジェクト全体の要件再定義（2026年7月）</summary>
+      <div class="body">
+        <p><b>目的：</b> ①②③が手戻りなく進むよう、各プロジェクトの現状・データ構造を先に整理する。データベース整備にあたり、既存の業務フロー・登録ルールを見直す部分が出てくる見込み。</p>
+        <ul>
+          <li><b>現状の業務フロー確認：</b> 各施設からの注文書（郵送・FAX、フォーマットバラバラ＝手書き／表になっていない／単位表記不統一）を事務員が手入力で商魂に登録、というオペレーションを正式に文書化</li>
+          <li><b>「振分表自動化用フォーマット」の設計：</b> 紙の注文書から人が入力する際の標準フォーマットを設計し、商品データの登録ルール（名称・単位等）をここで統一する</li>
+          <li><b>商魂取り込み用CSV変換ロジックの設計：</b> 振分表自動化用フォーマット→商魂で取り込めるCSVへの自動変換（GAS等で実装、MVPで動いたロジックを再利用できる部分を確認）</li>
+          <li><b>OCR再検討：</b> 自社のGAS版OCRは精度100％未達で「入口は人力」と判断済みだが、CO-NECTのような専門サービスならその精度問題を解決できる可能性がある。入口の自動化を再挑戦する価値があるか、それとも「入口は人力固定」で確定とするかを決める（CO-NECTはFAX/PDF→AI-OCR→商品マスタへ自動置換（学習型）→単位変換まで対応。ただし外部SaaSにルール・データを預ける形になる点は要検討）</li>
+          <li><b>POSレジ管理業者へのヒアリング（最優先）：</b> データ抽出方法（API／CSVエクスポート等）、契約上の制約、追加コストの有無</li>
+          <li>ラベル印刷機との連動仕様の確認（POS登録情報がどう変換されて印字されるか）</li>
+          <li>商品データの登録ルール（現状、感覚的に運用されている部分）の可視化</li>
+          <li>ダッシュボードに必要なデータ項目・粒度の洗い出し（卸・小売・SNS/PR元データ）</li>
+        </ul>
+        <p style="font-size:12.5px;color:var(--text-tertiary)">※商魂とPOSのデータを統合するのではなく、「商品マスタの名称・規格などの呼び方だけ揃える」程度の軽い統一にとどめる方針</p>
+        <p><b>出力物：</b> データ要件定義書（全体像がわかるもの）</p>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>フェーズ1｜振り分け自動化 再設計（最優先・2026年7月〜8月）</summary>
+      <div class="body">
+        <p><b>①振り分け自動化（卸売・商魂側）：</b> フェーズ0で確定した設計方向（振り分け表起点→商魂入力）とOCR方針を踏まえて実装。MVPで動いていたGASロジックは可能な限り再利用し、ゼロから作り直さない。</p>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>フェーズ2｜並行して進める低リスクタスク（2026年7月〜10月）</summary>
+      <div class="body">
+        <p>①の再設計を最優先で進める一方、データ基盤を待たずに着手できるタスクは並行して進め、早期に成果を積み上げる。</p>
+        <ul>
+          <li><b>⑤広報PR：</b> 既存記事2本をFew-shotにして、原稿生成のテンプレート化（月2〜4本ペース）。Cursorでのブログ生成自動化の実績があるため実装ハードルは低い。③ポータルへの自動蓄積部分はフェーズ3で対応</li>
+          <li><b>⑦Instagram：</b> 投稿文生成の自動化（週次・水曜投稿に合わせる）</li>
+          <li><b>⑥HPリニューアル：</b> 設計・コピーは制作済みのため、残タスクの「写真撮影」→「実装」のみ。ダッシュボードや①②の結果を待たずに着手できる</li>
+          <li><b>②POSデータ分析：</b> 手元の24ヶ月分CD-ROMデータを統合・分析・グラフ化（商品別月次売上、前年同月比、年間推移）。POS業者連携は不要</li>
+          <li><b>③ダッシュボードの枠組み構築：</b> 「卸売ページ／小売ページ／統合ページ」の売上ページ構成を先行して設計・実装。データは②の分析結果から段階的に流し込む。社内ポータルへの拡張部分は土台のみこの時点で設計しておく</li>
+          <li><b>スポットクリエイティブ：</b> 都度対応として継続（恒常タスク）</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>フェーズ3｜ダッシュボード本格稼働＋ポータル拡張（2026年10月〜12月）</summary>
+      <div class="body">
+        <p>フェーズ2で作った枠組みに、①の卸売データを統合して本格稼働させる。同時に、社内ポータルへの構想拡大分はモジュール単位で段階的に追加する。</p>
+        <h3>売上ダッシュボード（コア機能）</h3>
+        <ul>
+          <li>卸売ページ（①のデータ）／小売ページ（②のデータ）／統合ページ（全社売上）の3構成</li>
+          <li>長期利用を前提にした自社ポータルとして設計（一過性ではなく運用し続けられる構造に）</li>
+        </ul>
+        <h3>社内ポータルへの拡張（モジュール単位で段階追加）</h3>
+        <ul>
+          <li>各施策（Instagram・広報PR等）のデータ置き場へのリンク集約ページ</li>
+          <li><b>⑤広報PRの投稿済みデータの自動蓄積</b>（原稿・素材・掲載実績を③に流し込む設計）</li>
+          <li>各施策の専用解説ページ</li>
+          <li>ブランドコンセプト資料庫（言語化ドキュメントの一元管理）</li>
+          <li>タスク管理ページ（代表がスタッフの進捗を把握できる）</li>
+          <li>重要情報の通知設定など、AIを活用した自動化機能</li>
+        </ul>
+        <p style="font-size:12.5px;color:var(--text-tertiary)">社内ポータルの構想は範囲が広く、すべてをフェーズ3内で完成させるのは現実的ではありません。コア（売上ダッシュボード）→中期（リンク集約・解説ページ・ブランド資料庫）→長期（タスク管理・通知自動化）の3段階で優先順位をつけて進めます。どのモジュールを次に着手するかは、フェーズ3完了時点で確定します。</p>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>フェーズ4｜注文予約アプリ（2026年後半〜2027年、段階的）</summary>
+      <div class="body">
+        <p>UIイメージは参考サービスをもとにすり合わせ済み。0→1の大型開発かつ決済・DB設計が絡むため、最も時間を要する想定。早期に要件定義だけ並行着手するのが現実的。</p>
+        <ul>
+          <li><b>Step0：</b> 要件・素材整理（UX設計、必要な写真・テキスト等の素材リスト化、商品ラインナップは小さく絞る）</li>
+          <li><b>Step1：</b> DB設計・決済システムの選定（小規模からの比較検討）。③ダッシュボードへのデータ吸い上げ設計、⑥HPとのリンク方法もここで合わせて固める</li>
+          <li><b>Step2：</b> 予約のみのMVP（決済なし・店頭受け取り前提）でリリース</li>
+          <li><b>Step3：</b> 決済機能を追加し、全国対応へ拡張（オンライン的な使い方を想定）</li>
+        </ul>
+        <p style="font-size:12.5px;color:var(--text-tertiary)">開発に集中する方針のため、商品ラインナップ拡大やプロモーションは後回しでよい（まず「営業日以外でも事前注文できる」というコア体験の実現を優先）。</p>
+      </div>
+    </details>
+
+    <details class="phase">
+      <summary>フェーズ5｜HP×オンライン販売接続／100周年ローンチ（2027年1月1日）</summary>
+      <div class="body">
+        <p>HP自体は2026年内に公開済みの想定。100周年のタイミングで残る統合作業を仕上げる。</p>
+        <ul>
+          <li>HPとオンライン販売（注文予約アプリ）の接続</li>
+          <li>予約アプリの稼働開始（MVP版）</li>
+          <li>ブランドリニューアルの発信（PR記事と連動させ、認知拡大を最大化）</li>
+        </ul>
+      </div>
+    </details>
+  </section>
+
+  <section id="risks">
+    <h2>4. 要確認・要決定事項（リスク・前提）</h2>
+
+    <div class="note">
+      <b>100周年は2027年1月1日です。</b> このスケジュールでは、すべてのプロジェクトをこの日までに完了させることを目指すのではなく、<b>2026年12月31日までに主要プロジェクトに一区切りをつけること</b>を目標とします（提案）。2027年に入ってから進めるのが自然な部分（④注文予約アプリのStep2・Step3など）は、無理に年内完了を狙わず、引き続き丁寧に進めます。
+    </div>
+
+    <div class="risk-card">
+      <div class="risk-title">POS管理業者とのデータ連携方法</div>
+      <p>API有無／エクスポート可否／契約上の制約が未確認。手元の24ヶ月分データには影響なし（分析は即着手可）。確認が必要なのは将来のライブ・継続連携のみ。</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">入口OCRの再挑戦可否</div>
+      <p>自社GAS版OCRは精度100％未達で「入口は人力」と判断済み。CO-NECT等の専門サービスを使えば自動化できる可能性がある。再検討する価値があるか／「振分表フォーマットへの人力入力→商魂CSV変換」の自動化のみで十分かを、フェーズ0で判断。</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">予約アプリの決済システム</div>
+      <p>Stripe等、未検討。フェーズ4のStep1で本格検討が必要。</p>
+    </div>
+    <div class="risk-card">
+      <div class="risk-title">リソースの現実的な上限</div>
+      <p>一人体制での並行稼働範囲。フェーズ1・3の期間（7〜8月、10〜12月）が楽観的すぎないか要調整。</p>
+    </div>
+  </section>
+
+  <p style="font-size:14px; margin: 28px 2px 0; color:var(--text)">
+    このスケジュールを一つひとつ実行していくことで、精肉店としては数少ない、データと自動化に支えられた現代的な事業基盤が整います。それは森脇商店の「老舗としての信頼」と「新しい挑戦」を、これからも両立させていくための土台になるはずです。現場の皆さまには日々の業務に集中していただき、開発側はリソースに限りがある中でも、優先順位を守りながら一つずつ確実に前進してまいります。100周年という大きな節目に向けて、着実に進めていきましょう。
+  </p>
+
+  <footer>本ページは進行に応じて随時更新します。</footer>
+
+</div>
+</body>
+</html>
